@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wake Up the Princess</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .game-area {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+            perspective: 1000px;
+        }
+
+        .bed {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #d4a574 0%, #e8c4a0 50%, #d4a574 100%);
+            border-radius: 15px;
+            border: 3px solid #8b6f47;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .pillow {
+            position: absolute;
+            top: 20px;
+            width: 120px;
+            height: 50px;
+            background: linear-gradient(135deg, #fff5e1 0%, #ffe8cc 100%);
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            border: 2px solid #ffe8cc;
+        }
+
+        .princess {
+            position: absolute;
+            width: 100px;
+            height: 120px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            z-index: 10;
+        }
+
+        .princess:active {
+            transform: scale(0.95);
+        }
+
+        .princess-head {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #f4b896 0%, #d89968 100%);
+            border-radius: 50%;
+            top: 0;
+            left: 25px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .princess-hair {
+            position: absolute;
+            width: 60px;
+            height: 35px;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #ff69b4 100%);
+            border-radius: 50% 50% 0 0;
+            top: -5px;
+            left: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .princess-eyes {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+            top: 15px;
+            left: 32px;
+            transition: opacity 0.3s;
+        }
+
+        .princess-eyes::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+            left: 16px;
+        }
+
+        .princess.sleeping .princess-eyes {
+            opacity: 0;
+        }
+
+        .princess.sleeping .princess-eyes::after {
+            content: '━━';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            left: 12px;
+            top: 2px;
+            background: none;
+            border: none;
+            opacity: 1;
+        }
+
+        .princess-body {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #ff69b4 100%);
+            border-radius: 15px;
+            top: 48px;
+            left: 15px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tap-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .prince {
+            position: absolute;
+            width: 100px;
+            height: 120px;
+            right: -120px;
+            top: 30px;
+            transition: right 0.8s ease-out;
+            z-index: 5;
+        }
+
+        .prince.appearing {
+            right: 20px;
+        }
+
+        .prince-head {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #f4b896 0%, #d89968 100%);
+            border-radius: 50%;
+            top: 0;
+            left: 25px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .prince-hair {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+            border-radius: 50% 50% 0 0;
+            top: -2px;
+            left: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .prince-crown {
+            position: absolute;
+            width: 50px;
+            height: 15px;
+            top: -8px;
+            left: 25px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .prince-body {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #1e3a8a 100%);
+            border-radius: 15px;
+            top: 48px;
+            left: 15px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .message {
+            font-size: 24px;
+            color: #764ba2;
+            font-weight: bold;
+            margin-bottom: 20px;
+            min-height: 30px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .message.show {
+            opacity: 1;
+        }
+
+        .tap-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tap-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .tap-button:active {
+            transform: translateY(0);
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            animation: float-up 1s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.5);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .reset-button {
+            background: white;
+            color: #764ba2;
+            border: 2px solid #764ba2;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 10px;
+        }
+
+        .reset-button:hover {
+            background: #764ba2;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💤 Wake Up the Princess! 💤</h1>
+        <p class="subtitle">Tap her to wake her up!</p>
+
+        <div class="message" id="message"></div>
+
+        <div class="game-area">
+            <div class="bed">
+                <div class="pillow"></div>
+                <div class="princess sleeping" id="princess">
+                    <div class="princess-hair"></div>
+                    <div class="princess-head">
+                        <div class="princess-eyes"></div>
+                    </div>
+                    <div class="princess-body"></div>
+                </div>
+                <div class="prince" id="prince">
+                    <div class="prince-crown"></div>
+                    <div class="prince-hair"></div>
+                    <div class="prince-head"></div>
+                    <div class="prince-body"></div>
+                </div>
+            </div>
+            <div class="tap-indicator" id="tapCounter">Taps: 0/5</div>
+        </div>
+
+        <div id="gameControls">
+            <button class="tap-button" id="tapButton" onclick="tap()">TAP TO WAKE HER UP!</button>
+        </div>
+
+        <div id="victoryScreen" class="hidden" style="padding-top: 20px;">
+            <p style="font-size: 18px; color: #666; margin-bottom: 15px;">She's awake! The prince is here to save her!</p>
+            <button class="tap-button" onclick="reset()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        let taps = 0;
+        const maxTaps = 5;
+        const princess = document.getElementById('princess');
+        const prince = document.getElementById('prince');
+        const message = document.getElementById('message');
+        const tapCounter = document.getElementById('tapCounter');
+        const gameControls = document.getElementById('gameControls');
+        const victoryScreen = document.getElementById('victoryScreen');
+
+        function tap() {
+            if (taps >= maxTaps) return;
+
+            taps++;
+            tapCounter.textContent = `Taps: ${taps}/${maxTaps}`;
+
+            // Create floating hearts
+            createHeart();
+
+            if (taps === maxTaps) {
+                wakeUp();
+            }
+        }
+
+        function wakeUp() {
+            // Open eyes
+            princess.classList.remove('sleeping');
+
+            // Show message
+            message.textContent = '✨ She\'s awake! ✨';
+            message.classList.add('show');
+
+            // Prince appears!
+            setTimeout(() => {
+                prince.classList.add('appearing');
+            }, 300);
+
+            // Show victory screen
+            setTimeout(() => {
+                gameControls.classList.add('hidden');
+                victoryScreen.classList.remove('hidden');
+            }, 1200);
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.textContent = '❤️';
+            heart.className = 'heart';
+            heart.style.left = Math.random() * 100 + 'px';
+            heart.style.top = '100px';
+            document.querySelector('.game-area').appendChild(heart);
+
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        function reset() {
+            taps = 0;
+            tapCounter.textContent = `Taps: ${taps}/${maxTaps}`;
+            princess.classList.add('sleeping');
+            prince.classList.remove('appearing');
+            message.classList.remove('show');
+            gameControls.classList.remove('hidden');
+            victoryScreen.classList.add('hidden');
+        }
+
+        // Allow spacebar to tap
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                tap();
+            }
+        });
+    </script>
+</body>
+</html>
